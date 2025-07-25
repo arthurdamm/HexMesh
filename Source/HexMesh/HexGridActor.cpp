@@ -12,10 +12,12 @@ AHexGridActor::AHexGridActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	HexMeshComponent = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("HexMeshComponent"));
-    RootComponent = HexMeshComponent;
+    // RootComponent = HexMeshComponent;
+    SetRootComponent(HexMeshComponent);
 
     // Optional: Set default mesh via code (you can also do it in BP)
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("/Game/SM_NativeFlatHex.SM_NativeFlatHex"));
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("/Game/SM_FlatHexTwoMaterials.SM_FlatHexTwoMaterials"));
+	
     if (MeshAsset.Succeeded())
     {
         HexMesh = MeshAsset.Object;
@@ -28,6 +30,14 @@ AHexGridActor::AHexGridActor()
 	if (MaterialFinder.Succeeded()) {
 		UE_LOG(LogTemp, Warning, TEXT("UNativeTextureActorComponent Material found!"));
 		HexMaterial = MaterialFinder.Object;
+	} else {
+		UE_LOG(LogTemp, Warning, TEXT("UNativeTextureActorComponent Material NOT found..."));
+	}
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> BorderMaterialFinder(TEXT("/Game/M_HexBorder.M_HexBorder"));
+	if (BorderMaterialFinder.Succeeded()) {
+		UE_LOG(LogTemp, Warning, TEXT("UNativeTextureActorComponent Material found!"));
+		HexBorderMaterial = BorderMaterialFinder.Object;
 	} else {
 		UE_LOG(LogTemp, Warning, TEXT("UNativeTextureActorComponent Material NOT found..."));
 	}
@@ -58,14 +68,21 @@ void AHexGridActor::OnConstruction(const FTransform& Transform)
 void AHexGridActor::GenerateHexGridISM()
 {
     HexMeshComponent->ClearInstances();
-	HexMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	// HexMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    HexMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	HexMeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 	HexMeshComponent->SetGenerateOverlapEvents(true);
 	HexMeshComponent->SetMaterial(0, HexMaterial);
+	HexMeshComponent->SetMaterial(1, HexBorderMaterial);
 	HexMeshComponent->bSelectable = true; // Optional: for editor use
+
+    // HexMeshComponent->SetPerInstanceCustomDataCount(5);
+    HexMeshComponent->NumCustomDataFloats = 5;
+
 
     float R = HexRadius;
 
+    int CustomDataIterator = 1;
     for (int q = -GridRadius; q <= GridRadius; ++q)
     {
         int r1 = FMath::Max(-GridRadius, -q - GridRadius);
@@ -78,7 +95,13 @@ void AHexGridActor::GenerateHexGridISM()
             FVector Position = FVector(x, y, 0.0f);
 
             FTransform InstanceTransform(FRotator::ZeroRotator, Position);
-            HexMeshComponent->AddInstance(InstanceTransform);
+            int32 InstanceIndex = HexMeshComponent->AddInstance(InstanceTransform);
+            HexMeshComponent->SetCustomDataValue(InstanceIndex, 0, CustomDataIterator % 2 ? 0.5f : 0.0f);
+            HexMeshComponent->SetCustomDataValue(InstanceIndex, 1, CustomDataIterator + 0.0f);
+            CustomDataIterator++;
+            
+
+
 			
         }
     }
