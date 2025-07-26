@@ -26,11 +26,12 @@ void AHexPC::OnLeftClick()
     UE_LOG(LogTemp, Warning, TEXT("AHexPC::OnLeftClick()"));
     FHitResult Hit;
     const bool bTraceComplex = true;  // helps when relying on mesh triangles
-    if (!GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, bTraceComplex, Hit))
+
+    // if (!GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, bTraceComplex, Hit))
+    if (!GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), bTraceComplex, Hit))
     {
         UE_LOG(LogTemp, Warning, TEXT("AHexPC::OnLeftClick !GetHitResultUnderCursorByChannel"));
         // If your project uses channels, you can also do: ECC_Visibility cast to ECollisionChannel
-        // GetHitResultUnderCursorByChannel(ECC_Visibility, bTraceComplex, Hit);
         return;
     }
 

@@ -49,8 +49,6 @@ AHexGridActor::AHexGridActor()
 void AHexGridActor::BeginPlay()
 {
 	Super::BeginPlay();
-	// GenerateHexGrid();
-	
 }
 
 // Called every frame
@@ -66,12 +64,6 @@ void AHexGridActor::OnConstruction(const FTransform& Transform)
 	GenerateHexGridISM();
     PrintAxialToInstance(AxialToInstance);
     PrintInstanceToAxial(InstanceToAxial);
-
-
-    const int32 TotalFloats = HexMeshComponent->PerInstanceSMCustomData.Num();
-    const int32 FloatCount  = TotalFloats / HexMeshComponent->GetInstanceCount();
-    UE_LOG(LogTemp, Warning, TEXT("FLOATT COUNT %d vs %d"), FloatCount, HexMeshComponent->NumCustomDataFloats);
-
 
     int32 InstanceCount = HexMeshComponent->GetInstanceCount();
 
@@ -96,20 +88,23 @@ void AHexGridActor::GenerateHexGridISM()
     InstanceToAxial.Reset();
 
     HexMeshComponent->ClearInstances();
-	// HexMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+    HexMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);              // no physics needed
+    HexMeshComponent->SetCollisionObjectType(ECC_WorldStatic);                        // typical for ISMs
+    HexMeshComponent->SetCollisionResponseToAllChannels(ECR_Ignore);                  // start clean
+    HexMeshComponent->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);       // the one we trace on
+    HexMeshComponent->SetGenerateOverlapEvents(false);                                // not needed for traces
+/*
     HexMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	HexMeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-	HexMeshComponent->SetGenerateOverlapEvents(true);
+*/
+    
 	HexMeshComponent->SetMaterial(0, HexMaterial);
 	HexMeshComponent->SetMaterial(1, HexBorderMaterial);
 	HexMeshComponent->bSelectable = true; // Optional: for editor use
-
-    // HexMeshComponent->SetPerInstanceCustomDataCount(5);
     HexMeshComponent->NumCustomDataFloats = 5;
 
-
     float R = HexRadius;
-
     int CustomDataIterator = 1;
     for (int q = -GridRadius; q <= GridRadius; ++q)
     {
@@ -122,18 +117,15 @@ void AHexGridActor::GenerateHexGridISM()
             float y = R * FMath::Sqrt(3.0f) * (r + q / 2.0f);
             FVector Position = FVector(x, y, 0.0f);
 
-            FTransform InstanceTransform(FRotator::ZeroRotator, Position);
+            FTransform InstanceTransform(FRotator::ZeroRotator, Position);  
+            InstanceTransform.SetScale3D(FVector(HexScaleFactor));
             int32 InstanceIndex = HexMeshComponent->AddInstance(InstanceTransform);
-            AxialToInstance.Add(TPair<int, int>(q, r), InstanceIndex);
-            InstanceToAxial.Add(InstanceIndex, TPair<int, int>(q, r));
-            // HexMeshComponent->SetCustomDataValue(InstanceIndex, 0, CustomDataIterator % 2 ? 0.0f : 1.0f);
             HexMeshComponent->SetCustomDataValue(InstanceIndex, 0, 0.f);
             HexMeshComponent->SetCustomDataValue(InstanceIndex, 1, CustomDataIterator + 0.0f);
+            AxialToInstance.Add(TPair<int, int>(q, r), InstanceIndex);
+            InstanceToAxial.Add(InstanceIndex, TPair<int, int>(q, r));
+
             CustomDataIterator++;
-            
-
-
-			
         }
     }
 }
