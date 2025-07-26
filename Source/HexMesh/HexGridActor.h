@@ -32,10 +32,10 @@ public:
     UStaticMesh* HexMesh;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hex Grid")
-    float HexRadius = 101.0f;
+    float HexRadius = 151.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hex Grid")
-    int32 GridRadius = 5;
+    int32 GridRadius = 2;
 
     void GenerateHexGridISM();
 	void GenerateHexGrid();
@@ -43,4 +43,11 @@ public:
 public:
 	UMaterialInterface* HexMaterial;
 	UMaterialInterface* HexBorderMaterial;
+
+private:
+	TMap<TPair<int, int>, int32> AxialToInstance;
+    TMap<int32, TPair<int, int>> InstanceToAxial;
+
+	void PrintAxialToInstance(const TMap<TPair<int, int>, int32> &Map);
+	void PrintInstanceToAxial(const TMap<int32, TPair<int, int>> &Map);
 };

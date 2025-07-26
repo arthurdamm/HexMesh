@@ -63,10 +63,38 @@ void AHexGridActor::OnConstruction(const FTransform& Transform)
 {
     Super::OnConstruction(Transform);
 	GenerateHexGridISM();
+    PrintAxialToInstance(AxialToInstance);
+    PrintInstanceToAxial(InstanceToAxial);
+
+    int32 InstanceCount = HexMeshComponent->GetInstanceCount();
+
+    UE_LOG(LogTemp, Warning, TEXT("PRINTING INSTANCES"));
+    for (int32 InstanceIndex = 0; InstanceIndex < InstanceCount; ++InstanceIndex)
+    {
+        FTransform InstanceTransform;
+        if (HexMeshComponent->GetInstanceTransform(InstanceIndex, InstanceTransform, /*bWorldSpace=*/true))
+        {
+            UE_LOG(LogTemp, Log, TEXT("Instance %d: Location = %s"), 
+                InstanceIndex, *InstanceTransform.GetLocation().ToString());
+        }
+
+        // Optional: Read custom data if you use PerInstanceCustomData
+        //float CustomValue = HexMeshComponent->PerInstanceSMCustomData[InstanceIndex];
+        int32 NumFloats = HexMeshComponent->NumCustomDataFloats;
+        int CustomDataIndex = 1;
+        float Value = HexMeshComponent->PerInstanceSMCustomData[InstanceIndex * NumFloats + CustomDataIndex];
+        UE_LOG(LogTemp, Log, TEXT("CustomData[%d][1] = %f"), InstanceIndex, Value);
+        CustomDataIndex = 0;
+        Value = HexMeshComponent->PerInstanceSMCustomData[InstanceIndex * NumFloats + CustomDataIndex];
+        UE_LOG(LogTemp, Log, TEXT("CustomData[%d][0] = %f"), InstanceIndex, Value);
+    }
 }
 
 void AHexGridActor::GenerateHexGridISM()
 {
+    AxialToInstance.Reset();
+    InstanceToAxial.Reset();
+
     HexMeshComponent->ClearInstances();
 	// HexMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     HexMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -96,7 +124,9 @@ void AHexGridActor::GenerateHexGridISM()
 
             FTransform InstanceTransform(FRotator::ZeroRotator, Position);
             int32 InstanceIndex = HexMeshComponent->AddInstance(InstanceTransform);
-            HexMeshComponent->SetCustomDataValue(InstanceIndex, 0, CustomDataIterator % 2 ? 0.5f : 0.0f);
+            AxialToInstance.Add(TPair<int, int>(q, r), InstanceIndex);
+            InstanceToAxial.Add(InstanceIndex, TPair<int, int>(q, r));
+            HexMeshComponent->SetCustomDataValue(InstanceIndex, 0, CustomDataIterator % 2 ? 0.0f : 1.0f);
             HexMeshComponent->SetCustomDataValue(InstanceIndex, 1, CustomDataIterator + 0.0f);
             CustomDataIterator++;
             
@@ -104,6 +134,24 @@ void AHexGridActor::GenerateHexGridISM()
 
 			
         }
+    }
+}
+
+void AHexGridActor::PrintAxialToInstance(const TMap<TPair<int, int>, int32> &Map)
+{
+    for (const TPair<TPair<int, int>, int32>& Entry : Map) {
+        const TPair<int, int>& Axial = Entry.Key;
+        int32 InstanceId = Entry.Value;
+        UE_LOG(LogTemp, Warning, TEXT("\tAxial [%d, %d] => %d"), Axial.Key, Axial.Value, InstanceId);
+    }
+}
+
+void AHexGridActor::PrintInstanceToAxial(const TMap<int32, TPair<int, int>> &Map)
+{
+    for (const TPair<int32, TPair<int, int>>& Entry : Map) {
+        int32 InstanceId = Entry.Key;
+        const TPair<int, int>& Axial = Entry.Value;
+        UE_LOG(LogTemp, Warning, TEXT("\tInstanceId %d => [%d, %d] "), InstanceId, Axial.Key, Axial.Value);
     }
 }
 
@@ -155,3 +203,4 @@ void AHexGridActor::GenerateHexGrid()
         }
     }
 }
+
