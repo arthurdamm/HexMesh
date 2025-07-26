@@ -1,5 +1,6 @@
 // HexPC.cpp
 #include "HexPC.h"
+#include "HexISMUtils.h"
 #include "Components/InstancedStaticMeshComponent.h"
 
 void AHexPC::BeginPlay()
@@ -53,29 +54,30 @@ void AHexPC::OnLeftClick()
         return;
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("AHexPC::OnLeftClick InstanceIndex %d"), InstanceIndex);
-    // Ensure we told the component how many custom floats we use (do this in your actor at startup)
-    // ISM->NumCustomDataFloats = 4;  // you’ve already got this in place.
+    // UE_LOG(LogTemp, Warning, TEXT("AHexPC::OnLeftClick InstanceIndex %d"), InstanceIndex);
+    // float color = HexISMUtils::GetPerInstanceCustomData(ISM, InstanceIndex, 0);
+    // ISM->
+    
+    TSet<int32>& SetForComp = Highlighted.FindOrAdd(ISM);
+    const bool bNowHighlighted = !SetForComp.Contains(InstanceIndex);
 
-    // Toggle a simple highlight flag at slot 0
-    // TSet<int32>& SetForComp = Highlighted.FindOrAdd(ISM);
-    // const bool bNowHighlighted = !SetForComp.Contains(InstanceIndex);
-
-    // if (bNowHighlighted)
-    // {
-    //     SetForComp.Add(InstanceIndex);
-    //     ISM->SetCustomDataValue(InstanceIndex, 0, 1.0f, /*bMarkRenderStateDirty*/ false);
-    // }
-    // else
-    // {
-    //     SetForComp.Remove(InstanceIndex);
-    //     ISM->SetCustomDataValue(InstanceIndex, 0, 0.0f, /*bMarkRenderStateDirty*/ false);
-    // }
+    if (bNowHighlighted)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("SET WHITE"));
+        SetForComp.Add(InstanceIndex);
+        ISM->SetCustomDataValue(InstanceIndex, 0, 1.0f, /*bMarkRenderStateDirty*/ false);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("SET BLACK"));
+        SetForComp.Remove(InstanceIndex);
+        ISM->SetCustomDataValue(InstanceIndex, 0, 0.0f, /*bMarkRenderStateDirty*/ false);
+    }
 
     // If you also packed color into [1..3], you can optionally set those here per click.
     // e.g., ISM->SetCustomDataValue(InstanceIndex, 1, 1.0f, false); // R
     //       ISM->SetCustomDataValue(InstanceIndex, 2, 1.0f, false); // G
     //       ISM->SetCustomDataValue(InstanceIndex, 3, 0.0f, false); // B
 
-    // ISM->MarkRenderStateDirty(); // push batched updates once
+    ISM->MarkRenderStateDirty(); // push batched updates once
 }

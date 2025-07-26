@@ -32,10 +32,10 @@ public:
     UStaticMesh* HexMesh;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hex Grid")
-    float HexRadius = 151.0f;
+    float HexRadius = 101.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hex Grid")
-    int32 GridRadius = 2;
+    int32 GridRadius = 10;
 
     void GenerateHexGridISM();
 	void GenerateHexGrid();

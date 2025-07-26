@@ -2,6 +2,7 @@
 
 
 #include "HexGridActor.h"
+#include "HexISMUtils.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -66,6 +67,12 @@ void AHexGridActor::OnConstruction(const FTransform& Transform)
     PrintAxialToInstance(AxialToInstance);
     PrintInstanceToAxial(InstanceToAxial);
 
+
+    const int32 TotalFloats = HexMeshComponent->PerInstanceSMCustomData.Num();
+    const int32 FloatCount  = TotalFloats / HexMeshComponent->GetInstanceCount();
+    UE_LOG(LogTemp, Warning, TEXT("FLOATT COUNT %d vs %d"), FloatCount, HexMeshComponent->NumCustomDataFloats);
+
+
     int32 InstanceCount = HexMeshComponent->GetInstanceCount();
 
     UE_LOG(LogTemp, Warning, TEXT("PRINTING INSTANCES"));
@@ -78,15 +85,8 @@ void AHexGridActor::OnConstruction(const FTransform& Transform)
                 InstanceIndex, *InstanceTransform.GetLocation().ToString());
         }
 
-        // Optional: Read custom data if you use PerInstanceCustomData
-        //float CustomValue = HexMeshComponent->PerInstanceSMCustomData[InstanceIndex];
-        int32 NumFloats = HexMeshComponent->NumCustomDataFloats;
-        int CustomDataIndex = 1;
-        float Value = HexMeshComponent->PerInstanceSMCustomData[InstanceIndex * NumFloats + CustomDataIndex];
-        UE_LOG(LogTemp, Log, TEXT("CustomData[%d][1] = %f"), InstanceIndex, Value);
-        CustomDataIndex = 0;
-        Value = HexMeshComponent->PerInstanceSMCustomData[InstanceIndex * NumFloats + CustomDataIndex];
-        UE_LOG(LogTemp, Log, TEXT("CustomData[%d][0] = %f"), InstanceIndex, Value);
+        UE_LOG(LogTemp, Log, TEXT("CustomData[%d][1] = %f"), InstanceIndex, HexISMUtils::GetPerInstanceCustomData(HexMeshComponent, InstanceIndex, 1));
+        UE_LOG(LogTemp, Log, TEXT("CustomData[%d][0] = %f"), InstanceIndex, HexISMUtils::GetPerInstanceCustomData(HexMeshComponent, InstanceIndex, 0));
     }
 }
 
@@ -126,7 +126,8 @@ void AHexGridActor::GenerateHexGridISM()
             int32 InstanceIndex = HexMeshComponent->AddInstance(InstanceTransform);
             AxialToInstance.Add(TPair<int, int>(q, r), InstanceIndex);
             InstanceToAxial.Add(InstanceIndex, TPair<int, int>(q, r));
-            HexMeshComponent->SetCustomDataValue(InstanceIndex, 0, CustomDataIterator % 2 ? 0.0f : 1.0f);
+            // HexMeshComponent->SetCustomDataValue(InstanceIndex, 0, CustomDataIterator % 2 ? 0.0f : 1.0f);
+            HexMeshComponent->SetCustomDataValue(InstanceIndex, 0, 0.f);
             HexMeshComponent->SetCustomDataValue(InstanceIndex, 1, CustomDataIterator + 0.0f);
             CustomDataIterator++;
             
