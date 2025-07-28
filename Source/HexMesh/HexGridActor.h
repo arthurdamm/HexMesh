@@ -26,7 +26,7 @@ public:
 
 public:    
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Hex Grid")
-    class UInstancedStaticMeshComponent* HexMeshComponent;
+    class UHierarchicalInstancedStaticMeshComponent* HexMeshComponent;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hex Grid")
     UStaticMesh* HexMesh;
@@ -42,6 +42,12 @@ public:
 
     void GenerateHexGridISM();
 	void GenerateHexGrid();
+
+	void init(); 
+	virtual const TCHAR* GetMeshAssetPath() const
+	{
+    	return TEXT("/Game/SM_FlatHexTwoMaterials.SM_FlatHexTwoMaterials");
+	}
 
 public:
 	UMaterialInterface* HexMaterial;

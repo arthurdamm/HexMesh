@@ -1,6 +1,5 @@
 // HexPC.cpp
 #include "HexPC.h"
-#include "HexISMUtils.h"
 #include "Components/InstancedStaticMeshComponent.h"
 
 void AHexPC::BeginPlay()
@@ -19,6 +18,12 @@ void AHexPC::SetupInputComponent()
     // Classic input binding (works without Enhanced Input)
     check(InputComponent);
     InputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AHexPC::OnLeftClick);
+    InputComponent->BindTouch(IE_Pressed, this, &AHexPC::OnTouchPressed);
+}
+
+void AHexPC::OnTouchPressed(ETouchIndex::Type FingerIndex, FVector Location)
+{
+    OnLeftClick(); // Call your shared click logic
 }
 
 void AHexPC::OnLeftClick()
@@ -55,10 +60,6 @@ void AHexPC::OnLeftClick()
         return;
     }
 
-    // UE_LOG(LogTemp, Warning, TEXT("AHexPC::OnLeftClick InstanceIndex %d"), InstanceIndex);
-    // float color = HexISMUtils::GetPerInstanceCustomData(ISM, InstanceIndex, 0);
-    // ISM->
-    
     TSet<int32>& SetForComp = Highlighted.FindOrAdd(ISM);
     const bool bNowHighlighted = !SetForComp.Contains(InstanceIndex);
 
@@ -74,11 +75,6 @@ void AHexPC::OnLeftClick()
         SetForComp.Remove(InstanceIndex);
         ISM->SetCustomDataValue(InstanceIndex, 0, 0.0f, /*bMarkRenderStateDirty*/ false);
     }
-
-    // If you also packed color into [1..3], you can optionally set those here per click.
-    // e.g., ISM->SetCustomDataValue(InstanceIndex, 1, 1.0f, false); // R
-    //       ISM->SetCustomDataValue(InstanceIndex, 2, 1.0f, false); // G
-    //       ISM->SetCustomDataValue(InstanceIndex, 3, 0.0f, false); // B
 
     ISM->MarkRenderStateDirty(); // push batched updates once
 }
