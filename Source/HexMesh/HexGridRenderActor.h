@@ -21,5 +21,6 @@ protected:
 	virtual const TCHAR* GetMeshName() const override;
 	virtual const TCHAR* GetMeshAssetPath() const override;
 	virtual const TArray<const TCHAR*> GetMaterialAssetPaths() const override;
+	void ConfigureISM() override;
 
 };

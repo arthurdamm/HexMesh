@@ -12,8 +12,12 @@ class HEXMESH_API AInstancedRenderActor : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AInstancedRenderActor();
+	virtual void Tick(float DeltaTime) override;
+	virtual void OnConstruction(const FTransform& Transform) override;
+
+	int32 AddInstance(FVector Position, const TPair<int, int>& Axial);
+	virtual void ApplyCustomData(int32 InstanceIndex, const TPair<int, int>& Axial);
 
 protected:
 	// Called when the game starts or when spawned
@@ -21,6 +25,7 @@ protected:
 
 	bool ConstructorHelperInitAssets();
 	void InitISM();
+	virtual void ConfigureISM();
 
 	virtual const TCHAR* GetMeshName() const
 	{
@@ -37,10 +42,6 @@ protected:
     	return { TEXT("DUMMY") };
 	}
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-	virtual void OnConstruction(const FTransform& Transform) override;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ISM")
@@ -54,8 +55,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ISM")
     float ScaleFactor = 10.0f;
-
-	int32 AddInstance(FVector Position, const TPair<int, int>& Axial);
-
-	virtual void ApplyCustomData(int32 InstanceIndex, const TPair<int, int>& Axial);
 };

@@ -73,27 +73,30 @@ void AInstancedRenderActor::OnConstruction(const FTransform& Transform)
 	UE_LOG(LogTemp, Warning, TEXT("AInstancedRenderActor::OnConstruction() %s"), *GetClass()->GetName());
 
 	InitISM();
-
-
 }
 
 void AInstancedRenderActor::InitISM()
 {
 	ISM->ClearInstances();
 
-    ISM->SetCollisionEnabled(ECollisionEnabled::QueryOnly);              // no physics needed
-    ISM->SetCollisionObjectType(ECC_WorldStatic);                        // typical for ISMs
-    ISM->SetCollisionResponseToAllChannels(ECR_Ignore);                  // start clean
-    ISM->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);       // the one we trace on
-    ISM->SetGenerateOverlapEvents(false);                                // not needed for traces
-	ISM->bSelectable = true; // Optional: for editor use
-    ISM->NumCustomDataFloats = GameISMUtils::DEFAULT_NUM_CUSTOM_DATA_FLOATS;
+	ConfigureISM();
 
 	for (int32 i = 0; i < Materials.Num(); i++)
 	{
 		ISM->SetMaterial(i, Materials[i]);
 	}
 
+}
+
+void AInstancedRenderActor::ConfigureISM()
+{
+	ISM->SetCollisionEnabled(ECollisionEnabled::QueryOnly);              // no physics needed
+    ISM->SetCollisionObjectType(ECC_WorldStatic);                        // typical for ISMs
+    ISM->SetCollisionResponseToAllChannels(ECR_Ignore);                  // start clean
+    ISM->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);       // the one we trace on
+    ISM->SetGenerateOverlapEvents(false);                                // not needed for traces
+	ISM->bSelectable = true; // Optional: for editor use
+    ISM->NumCustomDataFloats = GameISMUtils::DEFAULT_NUM_CUSTOM_DATA_FLOATS;
 }
 
 int32 AInstancedRenderActor::AddInstance(FVector Position, const TPair<int, int>& Axial)
