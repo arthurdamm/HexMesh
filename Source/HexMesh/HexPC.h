@@ -20,6 +20,7 @@ protected:
 
 private:
     void OnLeftClick();
+    void OnTouchPressed(ETouchIndex::Type FingerIndex, FVector Location);
 
     // Optional: remember which indices are highlighted per component
     TMap<TWeakObjectPtr<class UInstancedStaticMeshComponent>, TSet<int32>> Highlighted;

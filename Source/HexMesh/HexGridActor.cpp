@@ -2,32 +2,34 @@
 
 
 #include "HexGridActor.h"
-#include "HexISMUtils.h"
-#include "Components/InstancedStaticMeshComponent.h"
+#include "GameISMUtils.h"
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
-// Sets default values
-AHexGridActor::AHexGridActor()
-{
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
-	HexMeshComponent = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("HexMeshComponent"));
+
+void AHexGridActor::init() {
+     HexMeshComponent = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("HexMeshComponent"));
     // RootComponent = HexMeshComponent;
     SetRootComponent(HexMeshComponent);
 
-    // Optional: Set default mesh via code (you can also do it in BP)
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("/Game/SM_FlatHexTwoMaterials.SM_FlatHexTwoMaterials"));
+    // const TCHAR* AssetPath = TEXT("/Game/SM_FlatHexTwoMaterials.SM_FlatHexTwoMaterials");
+    // static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(GetMeshAssetPath());
 	
-    if (MeshAsset.Succeeded())
-    {
-        HexMesh = MeshAsset.Object;
-        HexMeshComponent->SetStaticMesh(HexMesh);
-    } else {
-		UE_LOG(LogTemp, Warning, TEXT("AHexGridActor::AHexGridActor() failed to load HexMesh!"));
-	}
+    // if (MeshAsset.Succeeded())
+    // {
+    //     HexMesh = MeshAsset.Object;
+    //     HexMeshComponent->SetStaticMesh(HexMesh);
+    // } else {
+	// 	UE_LOG(LogTemp, Warning, TEXT("AHexGridActor::AHexGridActor() failed to load HexMesh!"));
+	// }
 
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaterialFinder(TEXT("/Game/M_HexBasic.M_HexBasic"));
+    UStaticMesh* Meshy = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), nullptr, GetMeshAssetPath()));
+    HexMesh = Meshy;
+    HexMeshComponent->SetStaticMesh(HexMesh);
+
+    const TCHAR* MatPath = TEXT("/Game/M_HexBasic.M_HexBasic");
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaterialFinder(MatPath);
 	if (MaterialFinder.Succeeded()) {
 		UE_LOG(LogTemp, Warning, TEXT("UNativeTextureActorComponent Material found!"));
 		HexMaterial = MaterialFinder.Object;
@@ -35,13 +37,26 @@ AHexGridActor::AHexGridActor()
 		UE_LOG(LogTemp, Warning, TEXT("UNativeTextureActorComponent Material NOT found..."));
 	}
 
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> BorderMaterialFinder(TEXT("/Game/M_HexBorder.M_HexBorder"));
-	if (BorderMaterialFinder.Succeeded()) {
-		UE_LOG(LogTemp, Warning, TEXT("UNativeTextureActorComponent Material found!"));
-		HexBorderMaterial = BorderMaterialFinder.Object;
-	} else {
-		UE_LOG(LogTemp, Warning, TEXT("UNativeTextureActorComponent Material NOT found..."));
-	}
+	// static ConstructorHelpers::FObjectFinder<UMaterialInterface> BorderMaterialFinder(TEXT("/Game/M_HexBorder.M_HexBorder"));
+	// if (BorderMaterialFinder.Succeeded()) {
+	// 	UE_LOG(LogTemp, Warning, TEXT("UNativeTextureActorComponent Material found!"));
+	// 	HexBorderMaterial = BorderMaterialFinder.Object;
+	// } else {
+	// 	UE_LOG(LogTemp, Warning, TEXT("UNativeTextureActorComponent Material NOT found..."));
+	// }
+
+    UMaterialInterface* Matty = Cast<UMaterialInterface>(StaticLoadObject(UMaterialInterface::StaticClass(), nullptr, TEXT("/Game/M_HexBorder.M_HexBorder")));
+    HexBorderMaterial = Matty;
+    UE_LOG(LogTemp, Warning, TEXT("MATTY init!"));
+}
+// Sets default values
+AHexGridActor::AHexGridActor()
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+    init();
+   
 
 }
 
@@ -75,10 +90,11 @@ void AHexGridActor::OnConstruction(const FTransform& Transform)
         {
             UE_LOG(LogTemp, Log, TEXT("Instance %d: Location = %s"), 
                 InstanceIndex, *InstanceTransform.GetLocation().ToString());
+                HexMeshComponent->UpdateInstanceTransform(InstanceIndex, InstanceTransform, /*bWorldSpace=*/true, true);
         }
 
-        UE_LOG(LogTemp, Log, TEXT("CustomData[%d][1] = %f"), InstanceIndex, HexISMUtils::GetPerInstanceCustomData(HexMeshComponent, InstanceIndex, 1));
-        UE_LOG(LogTemp, Log, TEXT("CustomData[%d][0] = %f"), InstanceIndex, HexISMUtils::GetPerInstanceCustomData(HexMeshComponent, InstanceIndex, 0));
+        UE_LOG(LogTemp, Log, TEXT("CustomData[%d][1] = %f"), InstanceIndex, GameISMUtils::GetPerInstanceCustomData(HexMeshComponent, InstanceIndex, 1));
+        UE_LOG(LogTemp, Log, TEXT("CustomData[%d][0] = %f"), InstanceIndex, GameISMUtils::GetPerInstanceCustomData(HexMeshComponent, InstanceIndex, 0));
     }
 }
 
@@ -120,11 +136,13 @@ void AHexGridActor::GenerateHexGridISM()
             FTransform InstanceTransform(FRotator::ZeroRotator, Position);  
             InstanceTransform.SetScale3D(FVector(HexScaleFactor));
             int32 InstanceIndex = HexMeshComponent->AddInstance(InstanceTransform);
+
             HexMeshComponent->SetCustomDataValue(InstanceIndex, 0, 0.f);
             HexMeshComponent->SetCustomDataValue(InstanceIndex, 1, CustomDataIterator + 0.0f);
+
+
             AxialToInstance.Add(TPair<int, int>(q, r), InstanceIndex);
             InstanceToAxial.Add(InstanceIndex, TPair<int, int>(q, r));
-
             CustomDataIterator++;
         }
     }
@@ -181,6 +199,7 @@ void AHexGridActor::GenerateHexGrid()
             HexComponent->RegisterComponent(); // Make it live
             HexComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
             HexComponent->SetRelativeLocation(Position);
+            HexComponent->SetWorldScale3D(FVector(HexScaleFactor));
             HexComponent->SetStaticMesh(HexMesh);
             HexComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
             HexComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
@@ -189,6 +208,7 @@ void AHexGridActor::GenerateHexGrid()
             HexComponent->SetGenerateOverlapEvents(true);
             HexComponent->bSelectable = true;
 			HexMeshComponent->SetMaterial(0, HexMaterial);
+            HexMeshComponent->SetMaterial(1, HexBorderMaterial);
 
 #if WITH_EDITOR
             HexComponent->SetIsVisualizationComponent(false);

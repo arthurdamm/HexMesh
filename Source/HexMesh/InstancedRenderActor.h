@@ -1,0 +1,61 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "InstancedRenderActor.generated.h"
+
+UCLASS(Abstract)
+class HEXMESH_API AInstancedRenderActor : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AInstancedRenderActor();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	bool ConstructorHelperInitAssets();
+	void InitISM();
+
+	virtual const TCHAR* GetMeshName() const
+	{
+    	return TEXT("DUMMY");
+	}
+
+	virtual const TCHAR* GetMeshAssetPath() const
+	{
+    	return TEXT("DUMMY");
+	}
+
+	virtual const TArray<const TCHAR*> GetMaterialAssetPaths() const
+	{
+    	return { TEXT("DUMMY") };
+	}
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	virtual void OnConstruction(const FTransform& Transform) override;
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ISM")
+    class UInstancedStaticMeshComponent* ISM = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ISM")
+    UStaticMesh* StaticMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ISM")
+	TArray<UMaterialInterface*> Materials;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ISM")
+    float ScaleFactor = 10.0f;
+
+	int32 AddInstance(FVector Position, const TPair<int, int>& Axial);
+
+	virtual void ApplyCustomData(int32 InstanceIndex, const TPair<int, int>& Axial);
+};

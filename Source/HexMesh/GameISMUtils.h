@@ -2,8 +2,11 @@
 #pragma once
 #include "Components/InstancedStaticMeshComponent.h"
 
-namespace HexISMUtils
+namespace GameISMUtils
 {
+
+  constexpr int DEFAULT_NUM_CUSTOM_DATA_FLOATS = 5;
+  
   inline float GetPerInstanceCustomData(
     const UInstancedStaticMeshComponent* ISM,
     int32 InstanceIndex,
