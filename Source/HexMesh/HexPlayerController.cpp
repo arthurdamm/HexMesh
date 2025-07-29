@@ -1,8 +1,8 @@
 // HexPC.cpp
-#include "HexPC.h"
+#include "HexPlayerController.h"
 #include "Components/InstancedStaticMeshComponent.h"
 
-void AHexPC::BeginPlay()
+void AHexPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
@@ -11,44 +11,44 @@ void AHexPC::BeginPlay()
     bEnableMouseOverEvents = false;  // optional
 }
 
-void AHexPC::SetupInputComponent()
+void AHexPlayerController::SetupInputComponent()
 {
     Super::SetupInputComponent();
-
+    
     // Classic input binding (works without Enhanced Input)
     check(InputComponent);
-    InputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AHexPC::OnLeftClick);
-    InputComponent->BindTouch(IE_Pressed, this, &AHexPC::OnTouchPressed);
+    InputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AHexPlayerController::OnLeftClick);
+    InputComponent->BindTouch(IE_Pressed, this, &AHexPlayerController::OnTouchPressed);
 }
 
-void AHexPC::OnTouchPressed(ETouchIndex::Type FingerIndex, FVector Location)
+void AHexPlayerController::OnTouchPressed(ETouchIndex::Type FingerIndex, FVector Location)
 {
     OnLeftClick(); // Call your shared click logic
 }
 
-void AHexPC::OnLeftClick()
+void AHexPlayerController::OnLeftClick()
 {
-    UE_LOG(LogTemp, Warning, TEXT("AHexPC::OnLeftClick()"));
+    UE_LOG(LogTemp, Warning, TEXT("AHexPlayerController::OnLeftClick() IRDER"));
     FHitResult Hit;
     const bool bTraceComplex = true;  // helps when relying on mesh triangles
 
     // if (!GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, bTraceComplex, Hit))
     if (!GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), bTraceComplex, Hit))
     {
-        UE_LOG(LogTemp, Warning, TEXT("AHexPC::OnLeftClick !GetHitResultUnderCursorByChannel"));
+        UE_LOG(LogTemp, Warning, TEXT("AHexPlayerController::OnLeftClick !GetHitResultUnderCursorByChannel"));
         // If your project uses channels, you can also do: ECC_Visibility cast to ECollisionChannel
         return;
     }
 
     if (!Hit.bBlockingHit) {
-        UE_LOG(LogTemp, Warning, TEXT("AHexPC::OnLeftClick !Hit.bBlockingHit"));
+        UE_LOG(LogTemp, Warning, TEXT("AHexPlayerController::OnLeftClick !Hit.bBlockingHit"));
         return;
     }
 
     UInstancedStaticMeshComponent* ISM = Cast<UInstancedStaticMeshComponent>(Hit.Component.Get());
     if (!ISM)
     {
-        UE_LOG(LogTemp, Warning, TEXT("AHexPC::OnLeftClick !ISM"));
+        UE_LOG(LogTemp, Warning, TEXT("AHexPlayerController::OnLeftClick !ISM"));
         return;
     }
 
@@ -56,7 +56,7 @@ void AHexPC::OnLeftClick()
     const int32 InstanceIndex = Hit.Item;
     if (InstanceIndex == INDEX_NONE)
     {
-        UE_LOG(LogTemp, Warning, TEXT("AHexPC::OnLeftClick InstanceIndex == INDEX_NONE"));
+        UE_LOG(LogTemp, Warning, TEXT("AHexPlayerController::OnLeftClick InstanceIndex == INDEX_NONE"));
         return;
     }
 

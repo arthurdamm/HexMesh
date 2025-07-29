@@ -7,7 +7,7 @@ namespace HexGrid
     constexpr float HEX_WIDTH = HEX_RADIUS * 2.f;
     const float HEX_HEIGHT = FMath::Sqrt(3.f) * HEX_RADIUS;
 
-    constexpr int GRID_RADIUS = 4;
+    constexpr int GRID_RADIUS = 1;
 
     inline FVector AxialToWorld(int32 Q, int32 R)
     {
