@@ -3,19 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "../lib/InstancedActor.h"
-#include "HexGridActor.generated.h"
-
-class AInstancedRenderActor;
+#include "HexMesh/lib/InstancedActor.h"
+#include "Ship1Actor.generated.h"
 
 UCLASS()
-class HEXMESH_API AHexGridActor : public AInstancedActor
+class HEXMESH_API AShip1Actor : public AInstancedActor
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
-	AHexGridActor();
+	AShip1Actor();
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,5 +24,4 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
 };

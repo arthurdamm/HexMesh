@@ -12,18 +12,6 @@ AHexGridActor::AHexGridActor()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// void AHexGridActor::OnConstruction(const FTransform& Transform)
-// {
-// 	LOG_CLASS();
-// 	if (!(RenderActor = GetWorld()->SpawnActor<AHexGridRenderActor>()))
-// 	{
-// 		LOG_CLASS_ERR("Failed to spawn RenderActor");
-// 		return;
-// 	}
-// 	RenderActor->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
-// 	RenderActor->SetActorRelativeLocation(FVector::ZeroVector);
-// }
-
 // Called when the game starts or when spawned
 void AHexGridActor::BeginPlay()
 {
@@ -39,5 +27,6 @@ void AHexGridActor::Tick(float DeltaTime)
 
 TSubclassOf<AInstancedRenderActor> AHexGridActor::GetRenderActorClass() const
 {
+	LOG_CLASS();
 	return AHexGridRenderActor::StaticClass();
 }
