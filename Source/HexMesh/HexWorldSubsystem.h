@@ -17,6 +17,7 @@ public:
 
     void BuildGrid();
     void PlaceShips();
+    bool DispatchClickEvent(UInstancedStaticMeshComponent* ISM, int32 instanceIndex);
 
 protected:
 	UPROPERTY()

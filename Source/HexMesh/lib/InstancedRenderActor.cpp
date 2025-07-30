@@ -1,8 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+#define MY_CLASSNAME TEXT("AInstancedRenderActor")
 
 #include "InstancedRenderActor.h"
-#include "GameISMUtils.h"
+#include "../GameISMUtils.h"
+#include "../utils/Logging.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -106,10 +106,40 @@ int32 AInstancedRenderActor::AddInstance(FVector Position, const TPair<int, int>
 	int32 InstanceIndex = ISM->AddInstance(InstanceTransform);
 
 	ApplyCustomData(InstanceIndex, Axial);
+	InstanceData.Emplace(InstanceIndex, MoveTemp(InstanceTransform));
 	return InstanceIndex;
 }
 
 void AInstancedRenderActor::ApplyCustomData(int32 InstanceIndex, const TPair<int, int>& Axial)
 {
 
+}
+
+void AInstancedRenderActor::PrintInstanceData()
+{
+	UE_LOG(LogTemp, Warning, TEXT("AInstancedRenderActor::PrintInstanceData()"));
+
+	for (const auto& [InstanceIndex, InstanceInfo] : InstanceData)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("\t[%d] => %s"), InstanceIndex, *InstanceInfo.Transform.GetLocation().ToString());
+	}
+
+}
+
+void AInstancedRenderActor::PrintInstances()
+{
+	FTransform instanceTransform;
+	for (int32 instanceIndex = 0; instanceIndex < ISM->GetNumInstances(); instanceIndex++)
+	{
+		if (!ISM->GetInstanceTransform(instanceIndex, instanceTransform, true))
+		{
+			LOG_CLASS_ERR(TEXT("Failed to GetInstanceTransform() for index: %d"), instanceIndex);
+			return;
+		}
+		LOG_CLASS_ERR(TEXT("Instance: %d Location = %s"), instanceIndex, *instanceTransform.GetLocation().ToString());
+		for (int customDataIndex = 0; customDataIndex < ISM->NumCustomDataFloats; customDataIndex++)
+		{
+			LOG_CLASS(TEXT("CustomData[%d] = %f"), customDataIndex, GameISMUtils::GetPerInstanceCustomData(ISM, instanceIndex, customDataIndex));
+		}
+	}
 }

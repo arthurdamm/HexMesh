@@ -6,6 +6,27 @@
 #include "GameFramework/Actor.h"
 #include "InstancedRenderActor.generated.h"
 
+USTRUCT(BlueprintType)
+struct FInstanceInfo
+{
+	GENERATED_BODY()
+	
+	UPROPERTY()
+	FTransform Transform;
+
+	UPROPERTY()
+	bool bIsVisible;
+	
+	// FLinearColor DebugColor;
+	// int32 OwningShipID;
+
+	FInstanceInfo() = default;
+	
+	FInstanceInfo(FTransform InTransform, bool bVisible = true)
+	: Transform(InTransform), bIsVisible(bVisible)
+	{}
+};
+
 UCLASS(Abstract)
 class HEXMESH_API AInstancedRenderActor : public AActor
 {
@@ -18,6 +39,8 @@ public:
 
 	int32 AddInstance(FVector Position, const TPair<int, int>& Axial);
 	virtual void ApplyCustomData(int32 InstanceIndex, const TPair<int, int>& Axial);
+	void PrintInstanceData();
+	void PrintInstances();
 
 protected:
 	// Called when the game starts or when spawned
@@ -55,4 +78,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ISM")
     float ScaleFactor = 10.0f;
+
+private:
+	UPROPERTY()
+	TMap<int32, FInstanceInfo> InstanceData;
 };
+

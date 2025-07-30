@@ -1,5 +1,6 @@
 // HexPC.cpp
 #include "HexPlayerController.h"
+#include "HexWorldSubsystem.h"
 #include "Components/InstancedStaticMeshComponent.h"
 
 void AHexPlayerController::BeginPlay()
@@ -56,8 +57,13 @@ void AHexPlayerController::OnLeftClick()
     const int32 InstanceIndex = Hit.Item;
     if (InstanceIndex == INDEX_NONE)
     {
-        UE_LOG(LogTemp, Warning, TEXT("AHexPlayerController::OnLeftClick InstanceIndex == INDEX_NONE"));
+        UE_LOG(LogTemp, Error, TEXT("AHexPlayerController::OnLeftClick InstanceIndex == INDEX_NONE"));
         return;
+    }
+
+    if (UHexWorldSubsystem* hexWorldSubsystem = GetWorld()->GetSubsystem<UHexWorldSubsystem>())
+    {
+        hexWorldSubsystem->DispatchClickEvent(ISM, InstanceIndex);
     }
 
     TSet<int32>& SetForComp = Highlighted.FindOrAdd(ISM);
@@ -71,7 +77,7 @@ void AHexPlayerController::OnLeftClick()
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("SET BLACK"));
+        UE_LOG(LogTemp, Warning, TEXT("SET BLACKsdd"));
         SetForComp.Remove(InstanceIndex);
         ISM->SetCustomDataValue(InstanceIndex, 0, 0.0f, /*bMarkRenderStateDirty*/ false);
     }

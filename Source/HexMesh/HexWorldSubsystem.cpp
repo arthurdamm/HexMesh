@@ -1,10 +1,14 @@
+#define MY_CLASSNAME TEXT("UHexWorldSubsystem")
+
 #include "HexWorldSubsystem.h"
 #include "HexGrid.h"
 #include "HexGridRenderActor.h"
 #include "Ship1RenderActor.h"
-
+#include "utils/Logging.h"
+#include "Components/InstancedStaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
+
 
 void UHexWorldSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 {
@@ -67,6 +71,8 @@ void UHexWorldSubsystem::BuildGrid()
 		UE_LOG(LogTemp, Warning, TEXT("No HexGridActor found to render!!!"));
 	}
 
+	HexGridRenderActor->PrintInstanceData();
+	HexGridRenderActor->PrintInstances();
     PlaceShips();
 }
 
@@ -83,3 +89,21 @@ void UHexWorldSubsystem::PlaceShips()
 		UE_LOG(LogTemp, Warning, TEXT("No Ship1RenderActor found to render!"));
 	}
 }
+
+bool UHexWorldSubsystem::DispatchClickEvent(UInstancedStaticMeshComponent* ISM, int32 instanceIndex)
+{
+	
+	if (AHexGridRenderActor* hexActor = Cast<AHexGridRenderActor>(ISM->GetOwner()))
+	{
+		LOG_CLASS("AHexGridRenderActor instanceIndex: %d", instanceIndex);
+	}
+	else if (AShip1RenderActor* shipActor = Cast<AShip1RenderActor>(ISM->GetOwner()))
+	{
+		LOG_CLASS("AShip1RenderActor instanceIndex: %d", instanceIndex);
+	}
+	// ISM->SetCustomDataValue(instanceIndex, 0, 0.0f, /*bMarkRenderStateDirty*/ false);
+	
+	return true;
+}
+
+// bool UHexWorldSubsystem::
