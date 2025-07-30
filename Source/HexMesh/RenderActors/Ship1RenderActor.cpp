@@ -1,6 +1,6 @@
 #include "Ship1RenderActor.h"
-#include "ISMHexAnimator.h"
-#include "HexGrid.h"
+#include "../ISMHexAnimator.h"
+#include "../HexGrid.h"
 
 AShip1RenderActor::AShip1RenderActor()
 {

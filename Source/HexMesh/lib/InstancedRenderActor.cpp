@@ -99,7 +99,7 @@ void AInstancedRenderActor::ConfigureISM()
     ISM->NumCustomDataFloats = GameISMUtils::DEFAULT_NUM_CUSTOM_DATA_FLOATS;
 }
 
-int32 AInstancedRenderActor::AddInstance(FVector Position, const TPair<int, int>& Axial)
+int32 AInstancedRenderActor::AddInstance(FVector Position, const FIntPoint& Axial)
 {
 	FTransform InstanceTransform(FRotator::ZeroRotator, Position);  
 	InstanceTransform.SetScale3D(FVector(ScaleFactor));
@@ -110,7 +110,7 @@ int32 AInstancedRenderActor::AddInstance(FVector Position, const TPair<int, int>
 	return InstanceIndex;
 }
 
-void AInstancedRenderActor::ApplyCustomData(int32 InstanceIndex, const TPair<int, int>& Axial)
+void AInstancedRenderActor::ApplyCustomData(int32 InstanceIndex, const FIntPoint& Axial)
 {
 
 }

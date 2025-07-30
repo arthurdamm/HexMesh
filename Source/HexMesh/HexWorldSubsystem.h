@@ -4,7 +4,9 @@
 
 // Forward declares only
 class AHexGridRenderActor;
+class AHexGridActor;
 class AShip1RenderActor;
+class AShip1Actor;
 
 UCLASS()
 class HEXMESH_API UHexWorldSubsystem : public UWorldSubsystem
@@ -24,5 +26,11 @@ protected:
 	AHexGridRenderActor* HexGridRenderActor = nullptr;
 
     UPROPERTY()
+    AHexGridActor* HexGridActor = nullptr;
+
+    UPROPERTY()
     AShip1RenderActor* Ship1RenderActor = nullptr;
+
+    UPROPERTY()
+    AShip1Actor* Ship1Actor = nullptr;
 };

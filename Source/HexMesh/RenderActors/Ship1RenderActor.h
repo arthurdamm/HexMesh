@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "lib/InstancedRenderActor.h"
+#include "../lib/InstancedRenderActor.h"
 #include "Ship1RenderActor.generated.h"
 
 class UISMHexAnimator;

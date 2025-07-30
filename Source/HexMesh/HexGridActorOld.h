@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "HexGridActor.generated.h"
+#include "HexGridActorOld.generated.h"
 
 UCLASS()
-class HEXMESH_API AHexGridActor : public AActor
+class HEXMESH_API AHexGridActorOld : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AHexGridActor();
+	AHexGridActorOld();
 
 protected:
 	// Called when the game starts or when spawned

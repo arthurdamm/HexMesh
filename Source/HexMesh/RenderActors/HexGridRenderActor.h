@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "lib/InstancedRenderActor.h"
+#include "../lib/InstancedRenderActor.h"
 #include "HexGridRenderActor.generated.h"
 
 /**

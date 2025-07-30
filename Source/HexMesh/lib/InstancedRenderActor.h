@@ -15,7 +15,7 @@ struct FInstanceInfo
 	FTransform Transform;
 
 	UPROPERTY()
-	bool bIsVisible;
+	bool bIsVisible = true;
 	
 	// FLinearColor DebugColor;
 	// int32 OwningShipID;
@@ -37,8 +37,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	int32 AddInstance(FVector Position, const TPair<int, int>& Axial);
-	virtual void ApplyCustomData(int32 InstanceIndex, const TPair<int, int>& Axial);
+	int32 AddInstance(FVector Position, const FIntPoint& Axial);
+	virtual void ApplyCustomData(int32 InstanceIndex, const FIntPoint& Axial);
 	void PrintInstanceData();
 	void PrintInstances();
 

@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "HexGridActor.h"
+#include "HexGridActorOld.h"
 #include "GameISMUtils.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
 
 
-void AHexGridActor::init() {
+void AHexGridActorOld::init() {
      HexMeshComponent = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("HexMeshComponent"));
     // RootComponent = HexMeshComponent;
     SetRootComponent(HexMeshComponent);
@@ -50,7 +50,7 @@ void AHexGridActor::init() {
     UE_LOG(LogTemp, Warning, TEXT("MATTY init!"));
 }
 // Sets default values
-AHexGridActor::AHexGridActor()
+AHexGridActorOld::AHexGridActorOld()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -61,19 +61,19 @@ AHexGridActor::AHexGridActor()
 }
 
 // Called when the game starts or when spawned
-void AHexGridActor::BeginPlay()
+void AHexGridActorOld::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
 // Called every frame
-void AHexGridActor::Tick(float DeltaTime)
+void AHexGridActorOld::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-void AHexGridActor::OnConstruction(const FTransform& Transform)
+void AHexGridActorOld::OnConstruction(const FTransform& Transform)
 {
     Super::OnConstruction(Transform);
 	GenerateHexGridISM();
@@ -98,7 +98,7 @@ void AHexGridActor::OnConstruction(const FTransform& Transform)
     }
 }
 
-void AHexGridActor::GenerateHexGridISM()
+void AHexGridActorOld::GenerateHexGridISM()
 {
     AxialToInstance.Reset();
     InstanceToAxial.Reset();
@@ -148,7 +148,7 @@ void AHexGridActor::GenerateHexGridISM()
     }
 }
 
-void AHexGridActor::PrintAxialToInstance(const TMap<TPair<int, int>, int32> &Map)
+void AHexGridActorOld::PrintAxialToInstance(const TMap<TPair<int, int>, int32> &Map)
 {
     for (const TPair<TPair<int, int>, int32>& Entry : Map) {
         const TPair<int, int>& Axial = Entry.Key;
@@ -157,7 +157,7 @@ void AHexGridActor::PrintAxialToInstance(const TMap<TPair<int, int>, int32> &Map
     }
 }
 
-void AHexGridActor::PrintInstanceToAxial(const TMap<int32, TPair<int, int>> &Map)
+void AHexGridActorOld::PrintInstanceToAxial(const TMap<int32, TPair<int, int>> &Map)
 {
     for (const TPair<int32, TPair<int, int>>& Entry : Map) {
         int32 InstanceId = Entry.Key;
@@ -166,7 +166,7 @@ void AHexGridActor::PrintInstanceToAxial(const TMap<int32, TPair<int, int>> &Map
     }
 }
 
-void AHexGridActor::GenerateHexGrid()
+void AHexGridActorOld::GenerateHexGrid()
 {
     // Clean up previous components if regenerating
     TArray<UActorComponent*> ExistingHexes = GetComponentsByTag(UStaticMeshComponent::StaticClass(), FName("EditorHex"));
